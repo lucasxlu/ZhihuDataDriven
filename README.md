@@ -5,8 +5,9 @@ Knowledge sharing plays a significant role in knowledge acquisition for ordinary
 however, due to the insufficient evaluation schemes, people suffer from lots of low-level
 knowledge services, which overwhelm the platform as well.
 
-In our paper, we propose a deep learning-based model to automatically predict a Zhihu Live's
-score. Our proposed ```MTB-DNN``` achieves the best performance among baseline models.
+In our paper, we propose a method to automatically predict a Zhihu Live's
+score through multi-modal learning (By learning from both database records and comments corpus within a model). 
+Our proposed ```MMNet``` achieves the best performance among baseline models.
 
 MAE | RMSE    
 :-: | :-:  
