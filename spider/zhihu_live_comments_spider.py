@@ -1,12 +1,9 @@
 import os
 import random
-
-import requests
 import time
-import xlwt
 
-import numpy as np
 import pandas as pd
+import requests
 
 
 def loadJson(url):
@@ -33,30 +30,30 @@ def loadJson(url):
 title = ["id", "created_at", "score", "content"]
 
 
-def write_to_excel(data, live_id):
+def write_to_csv(data, live_id):
     """
-    output to excel
+    output to CSV
     :param data:
     :param live_id:
     :return:
     """
     if not os.path.isdir("./ZhihuLiveComments") or not os.path.exists('./ZhihuLiveComments'):
         os.makedirs('./ZhihuLiveComments')
-    book = xlwt.Workbook()
-    sheet = book.add_sheet('Comments', cell_overwrite_ok=True)
-    for i in range(len(title)):
-        sheet.write(0, i, title[i])
-        index = 0
+
+    records = []
     for line in data:
-        index += 1
         print('record:', line)
-        sheet.write(index, 0, line['id'])
-        sheet.write(index, 1, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(line['created_at'])))
-        sheet.write(index, 2, line['score'])
-        sheet.write(index, 3, line['content'])
-        # for i in range(len(data[line])):
-        #     sheet.write(int(line), i + 1, data[line][i])
-    book.save('./ZhihuLiveComments/%s.xls' % str(live_id))
+        records.append([line['id'], line['created_at'], line['content'], line['score']])
+
+    col = [
+        u'id',
+        u'time',
+        u'score',
+        u'content']
+
+    print(records)
+    df = pd.DataFrame(records, columns=col)
+    df.to_csv('./ZhihuLiveComments/%s.csv' % str(live_id), index=False, encoding='GBK')
 
 
 def parseJson(live_id):
@@ -76,7 +73,7 @@ def parseJson(live_id):
         for i in page['data']:
             data.append({'content': i['content'], 'score': i['score'], 'created_at': i['created_at'], 'id': i['id']})
 
-    write_to_excel(data, live_id)
+        write_to_csv(data, live_id)
     time.sleep(random.randint(3, 5))
 
 
