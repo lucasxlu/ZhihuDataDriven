@@ -53,7 +53,7 @@ def write_to_csv(data, live_id):
 
     print(records)
     df = pd.DataFrame(records, columns=col)
-    df.to_csv('./ZhihuLiveComments/%s.csv' % str(live_id), index=False, encoding='GBK')
+    df.to_excel('./ZhihuLiveComments/%s.xlsx' % str(live_id), index=False, encoding='UTF-8')
 
 
 def parseJson(live_id):

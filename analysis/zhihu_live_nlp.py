@@ -31,8 +31,9 @@ def read_corpus():
     rates = []
 
     print('loading corpus...')
-    for xls in os.listdir(COMMENTS_DIR):
-        df = pd.read_excel(os.path.join(COMMENTS_DIR, xls), encoding='utf-8', index_col=None)
+    for csv in os.listdir(COMMENTS_DIR):
+        print('reading CSV: %s ...' % csv)
+        df = pd.read_csv(os.path.join(COMMENTS_DIR, csv), encoding='GBK', index_col=None, sep=',')
         df = df.dropna(how='any')
 
         documents += df['content'].tolist()
