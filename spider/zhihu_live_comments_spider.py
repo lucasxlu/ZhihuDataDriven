@@ -43,7 +43,7 @@ def write_to_csv(data, live_id):
     records = []
     for line in data:
         print('record:', line)
-        records.append([line['id'], line['created_at'], line['content'], line['score']])
+        records.append([line['id'], line['created_at'], line['score'], line['content']])
 
     col = [
         u'id',

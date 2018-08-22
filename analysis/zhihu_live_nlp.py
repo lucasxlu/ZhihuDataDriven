@@ -31,25 +31,26 @@ def read_corpus():
     rates = []
 
     print('loading corpus...')
-    for csv in os.listdir(COMMENTS_DIR):
-        print('reading CSV: %s ...' % csv)
-        df = pd.read_csv(os.path.join(COMMENTS_DIR, csv), encoding='GBK', index_col=None, sep=',')
+    for xlsx in os.listdir(COMMENTS_DIR):
+        print('reading Excel: %s ...' % xlsx)
+        df = pd.read_excel(os.path.join(COMMENTS_DIR, xlsx), encoding='GBK', index_col=None)
         df = df.dropna(how='any')
 
-        documents += df['content'].tolist()
-        rates += df['score'].tolist()
+        # reverse due to wrong code in crawler T_T
+        documents += df['score'].tolist()
+        rates += df['content'].tolist()
 
     print('tokenizer starts working...')
 
     texts = []
     import jieba.analyse
 
-    jieba.load_userdict('./user_dict.txt')
+    jieba.load_userdict('./userdict.txt')
     jieba.analyse.set_stop_words('./stopwords.txt')
     stopwords = [_.replace('\n', '') for _ in open('./stopwords.txt', encoding='utf-8').readlines()]
 
     for doc in documents:
-        words_in_doc = list(jieba.cut(doc.strip()))
+        words_in_doc = list(jieba.cut(str(doc).strip()))
         words_in_doc = list(filter(lambda w: w not in STOP_DENOTATION + stopwords, words_in_doc))
         texts.append(words_in_doc)
 
@@ -87,11 +88,12 @@ def get_w2v(texts, rate_label, train=True):
         model = Word2Vec(texts, size=W2V_DIMENSION, window=5, min_count=1, workers=4, iter=20)
         if not os.path.isdir('./model') or not os.path.exists('./model'):
             os.makedirs('./model')
-        model.save('./model/doubanbook_w2v.model')
+        print('word2vec training successfully...')
+        model.save('./model/zhihulive_comment_w2v.model')
 
     else:
         print('loading pretrained word2vec model...')
-        model = Word2Vec.load('./model/doubanbook_w2v.model')
+        model = Word2Vec.load('./model/zhihulive_comment_w2v.model')
 
     # print(model.wv['数学'])
     # similarity = model.wv.similarity('算法', '机器学习')
@@ -127,10 +129,10 @@ def get_d2v(words_list, labels, train=True):
         model.train(documents, total_examples=model.corpus_count, epochs=20)
         if not os.path.isdir('./model') or not os.path.exists('./model'):
             os.makedirs('./model')
-        model.save('./model/doubanbook_d2v.model')
+        model.save('./model/zhihulive_comment_d2v.model')
     else:
         print('loading pretrained doc2vec model...')
-        model = Doc2Vec.load('./model/doubanbook_d2v.model')
+        model = Doc2Vec.load('./model/zhihulive_comment_d2v.model')
 
     features = list()
 
@@ -162,4 +164,4 @@ class DoubanCommentsDataset(Dataset):
 
 if __name__ == '__main__':
     texts, rates = read_corpus()
-    get_w2v(texts, rates)
+    get_w2v(texts, rates, train=True)
