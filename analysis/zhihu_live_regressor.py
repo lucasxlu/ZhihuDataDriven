@@ -200,7 +200,7 @@ def train_and_test_model(train, test, train_Y, test_Y):
     print('===============The Root Mean Square Error is {0}===================='.format(rmse_lr))
     # print('===============The Pearson Correlation of Model is {0}===================='.format(pc))
 
-    from DataHouse.zhihu.zhihu_util import out_result
+    from util.zhihu_util import out_result
     out_result(predicted_score, test_Y)
 
 

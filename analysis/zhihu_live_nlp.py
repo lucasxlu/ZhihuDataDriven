@@ -95,14 +95,22 @@ def get_w2v(texts, rate_label, train=True):
         print('loading pretrained word2vec model...')
         model = Word2Vec.load('./model/zhihulive_comment_w2v.model')
 
-    # print(model.wv['数学'])
+    # print(model.wv['表情'])
     # similarity = model.wv.similarity('算法', '机器学习')
     # print(similarity)
     features = list()
     labels = list()
 
     for i in range(len(texts)):
-        f = np.array([model.wv[tx] for tx in texts[i]]).mean(axis=0).flatten().tolist()
+        w2v = []
+        for tx in texts[i]:
+            try:
+                w2v.append(model.wv[tx])
+            except:
+                pass
+
+        print(np.array(w2v).shape)
+        f = np.array(w2v).mean(axis=0).flatten().tolist()
         if len(f) == W2V_DIMENSION:
             features.append(f)
             labels.append(rate_label[i])
@@ -164,4 +172,5 @@ class DoubanCommentsDataset(Dataset):
 
 if __name__ == '__main__':
     texts, rates = read_corpus()
-    get_w2v(texts, rates, train=True)
+    X, y = get_w2v(texts, rates, train=False)
+
