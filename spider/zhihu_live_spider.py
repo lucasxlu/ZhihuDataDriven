@@ -101,7 +101,7 @@ def output_fields_from_mongo():
         starts_at = str(live['starts_at'])
         speaker_name = live['speaker']['member']['name']
         speaker_url = live['speaker']['member']['url_token']
-        live_subject = live['subject']
+        # live_subject = live['subject'].encode('utf-8', 'ignore').decode('utf-8')
         live_id = live['id']
         in_promotion = int(live['in_promotion'])
         duration = live['duration']
@@ -135,13 +135,13 @@ def output_fields_from_mongo():
         review_score = live['review']['score']
 
         live_info.append(
-            [id, created_at, starts_at, speaker_name, speaker_url, live_subject, live_id, in_promotion, duration,
+            [id, created_at, starts_at, speaker_name, speaker_url, live_id, in_promotion, duration,
              reply_message_count, source, purchasable, is_refundable, has_authenticated,
              user_type, gender, badge, tag_id, tag_name, speaker_audio_message_count, attachment_count, liked_num,
              is_commercial, audition_message_count, is_audition_open, seats_taken, seats_max, speaker_message_count,
              amount, original_price, buyable, has_audition, has_feedback, is_public, review_count, review_score])
 
-    cols = ['id', 'created_at', 'starts_at', 'speaker_name', 'speaker_url', 'live_subject', 'live_id', 'in_promotion',
+    cols = ['id', 'created_at', 'starts_at', 'speaker_name', 'speaker_url', 'live_id', 'in_promotion',
             'duration', 'reply_message_count', 'source', 'purchasable',
             'is_refundable', 'has_authenticated', 'user_type', 'gender', 'badge', 'tag_id', 'tag_name',
             'speaker_audio_message_count', 'attachment_count', 'liked_num', 'is_commercial',

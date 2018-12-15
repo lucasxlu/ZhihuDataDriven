@@ -6,8 +6,10 @@ however, due to the insufficient evaluation schemes, people suffer from lots of 
 knowledge services, which overwhelm the platform as well.
 
 In our paper, we propose a method to automatically predict a Zhihu Live's
-score through multi-modal learning (By learning from both database records and comments corpus within a model). 
-Our proposed ```MMNet``` achieves the best performance among baseline models.
+score through multi-modal learning (By learning from both database records 
+and comments corpus within a single model). 
+Our proposed ```HybridNet``` achieves the best performance among baseline 
+models.
 
 MAE | RMSE    
 :-: | :-:  

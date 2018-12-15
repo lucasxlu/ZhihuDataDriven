@@ -78,7 +78,7 @@ def parseJson(live_id):
 
 
 if __name__ == '__main__':
-    ids = pd.read_excel('../ZhihuLiveDB.xlsx', index_col=None)['id']
+    ids = pd.read_excel('./ZhihuLiveDB.xlsx', index_col=None)['id']
     for id in ids:
         print('processing ZhihuLive %s ...' % str(id))
         try:

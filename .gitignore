@@ -1,3 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 spider/ZhihuLiveComments/
+analysis/model/zhihulive_comment_w2v.model
+analysis/model/zhihulive_comment_w2v.model.trainables.syn1neg.npy
+analysis/model/zhihulive_comment_w2v.model.wv.vectors.npy
+spider/zhihu_live.log
