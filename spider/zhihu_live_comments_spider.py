@@ -83,6 +83,6 @@ if __name__ == '__main__':
         print('processing ZhihuLive %s ...' % str(id))
         try:
             parseJson(id)
-            time.sleep(random.randint(3, 8))
+            time.sleep(random.randint(3, 5))
         except:
             pass
