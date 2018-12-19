@@ -24,9 +24,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
-from util.cfg import cfg
-
 sys.path.append('../')
+from util.cfg import cfg
+from util.zhihu_util import mkdirs_if_not_exist
 from analysis.models import MTBDNN, MLP
 
 
@@ -105,6 +105,8 @@ def train_and_test_model(train, test, train_Y, test_Y):
     # model = MLPRegressor(hidden_layer_sizes=(16, 8, 8, 4), early_stopping=True, alpha=1e-4,
     #                      batch_size=16, learning_rate='adaptive')
     model.fit(train, train_Y.values.ravel())
+    mkdirs_if_not_exist('./model')
+    joblib.dump(model, './model/{0}.pkl' % model.__class__.__name__)
     predicted_score = model.predict(test)
     mae_lr = round(mean_absolute_error(test_Y, predicted_score), 4)
     rmse_lr = round(np.math.sqrt(mean_squared_error(test_Y, predicted_score)), 4)
@@ -278,7 +280,7 @@ def predict_score(zhihu_live_id):
 
 
 if __name__ == '__main__':
-    train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", 0.2)
+    train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", False)
     train_and_test_model(train_set, test_set, train_label, test_label)
     # train_and_test_mtb_dnns(train_set, test_set, train_label, test_label, 30)
 
