@@ -2,7 +2,7 @@ from sklearn.externals import joblib
 
 
 class ZhihuLivePredictor:
-    def __init__(self, pretrained_model):
+    def __init__(self, pretrained_model='./model/svr.pkl'):
         self.model = joblib.load(pretrained_model)
 
     def infer(self, zhihu_live):

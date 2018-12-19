@@ -106,7 +106,7 @@ def train_and_test_model(train, test, train_Y, test_Y):
     #                      batch_size=16, learning_rate='adaptive')
     model.fit(train, train_Y.values.ravel())
     mkdirs_if_not_exist('./model')
-    joblib.dump(model, './model/{0}.pkl' % model.__class__.__name__)
+    joblib.dump(model, './model/svr.pkl')
     predicted_score = model.predict(test)
     mae_lr = round(mean_absolute_error(test_Y, predicted_score), 4)
     rmse_lr = round(np.math.sqrt(mean_squared_error(test_Y, predicted_score)), 4)
