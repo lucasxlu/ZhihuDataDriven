@@ -6,9 +6,15 @@ import pandas as pd
 
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
+from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
 from torch.utils.data import Dataset
 from torchtext import data
+
+from util.zhihu_util import mkdirs_if_not_exist
 
 sys.path.append('../')
 
@@ -109,7 +115,7 @@ def get_w2v(texts, rate_label, train=True):
             except:
                 pass
 
-        print(np.array(w2v).shape)
+        # print(np.array(w2v).shape)
         f = np.array(w2v).mean(axis=0).flatten().tolist()
         if len(f) == W2V_DIMENSION:
             features.append(f)
@@ -174,3 +180,13 @@ if __name__ == '__main__':
     texts, rates = read_corpus()
     X, y = get_w2v(texts, rates, train=False)
 
+    print('start training sentiment classifier...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
+    clf.fit(X_train, y_train)
+    mkdirs_if_not_exist('./model')
+    joblib.dump(clf, './model/rfc.pkl')
+
+    cm = confusion_matrix(y_test, clf.predict(X_test))
+    print(cm)
+    print('finish training sentiment classifier...')
