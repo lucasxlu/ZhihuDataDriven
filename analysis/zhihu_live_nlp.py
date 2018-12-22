@@ -14,9 +14,8 @@ from sklearn.metrics import confusion_matrix
 from torch.utils.data import Dataset
 from torchtext import data
 
-from util.zhihu_util import mkdirs_if_not_exist
-
 sys.path.append('../')
+from util.zhihu_util import mkdirs_if_not_exist
 
 TFIDF_FEATURE_NUM = 200
 W2V_DIMENSION = 300
