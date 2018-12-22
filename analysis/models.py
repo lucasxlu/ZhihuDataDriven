@@ -1,17 +1,16 @@
 """
 Definition of Deep Models and Loss Functions
 """
-from collections import OrderedDict
 import sys
+from collections import OrderedDict
 
 import numpy as np
-import torch.nn as nn
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 
 sys.path.append('../')
-from util.cfg import cfg
 
 
 class ZhihuLiveDataset(Dataset):
@@ -48,23 +47,28 @@ class MTLoss(nn.Module):
 
 
 class Branch(nn.Module):
-    def __init__(self, params=[8, 4, 1]):
+    def __init__(self, params=None):
         """Constructs each branch necessary depending on input
         Args:
             b2(nn.Module()): An nn.Conv2d() is passed with specific params
         """
         super(Branch, self).__init__()
+        if params is None:
+            params = [8, 4, 1]
         self.bf1 = nn.Linear(params[0], params[1])
         self.bf2 = nn.Linear(params[1], params[2])
 
     def forward(self, x):
-        return self.bf2(F.tanh(self.bf1(x)))
+        return self.bf2(F.relu6(self.bf1(x)))
 
 
 class MTNet(nn.Module):
-    def __init__(self, K=2):
+    """
+    definition of MTNet
+    """
+
+    def __init__(self):
         super(MTNet, self).__init__()
-        self.K = K
         self.layers = nn.Sequential(OrderedDict([
             ('fc1', nn.Sequential(nn.Linear(23, 16),
                                   nn.ReLU())),
@@ -78,16 +82,12 @@ class MTNet(nn.Module):
         self.branch3 = Branch(params=[8, 5, 1])
 
     def forward(self, x):
-        out = torch.zeros([cfg['batch_size'], 1])
-        out = out.to(torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
+        x1 = self.layers(x)
+        x2 = torch.div(torch.add(torch.add(self.branch1(x1), self.branch2(x1)), self.branch3(x1)), 3)
 
-        for idx, module in self.layers.named_children():
-            x = F.tanh(module(x))
-
-        temp = x
-
-        return torch.div(torch.add(torch.add(self.branch1(temp), self.branch2(temp)), self.branch3(temp)), self.K)
-        # return torch.min([self.branch1(temp), self.branch2(temp), self.branch3(temp)])
+        return x2
+        # return (self.branch1(x1) + self.branch2(x1) + self.branch3(x1)) / 3
+        # return torch.min([self.branch1(x1), self.branch2(x1), self.branch3(x1)])
 
 
 class MLP(nn.Module):

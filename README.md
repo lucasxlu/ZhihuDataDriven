@@ -19,7 +19,7 @@ models.
 | KNN | 0.2401 | 0.3275|
 | Linear Regression | 0.2354 | 0.3224|
 | MLP | 0.2397 | 0.3276|
-| MTNet | - | - |
+| MTNet | 0.2255 | 0.3244 |
 
 
 For deeper analysis, please read my article at [Zhihu](https://zhuanlan.zhihu.com/p/30514792).

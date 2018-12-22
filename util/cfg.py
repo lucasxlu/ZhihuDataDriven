@@ -1,4 +1,4 @@
 from collections import OrderedDict
 
 cfg = OrderedDict()
-cfg['batch_size'] = 16
+cfg['batch_size'] = 32
