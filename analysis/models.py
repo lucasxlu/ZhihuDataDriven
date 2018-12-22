@@ -4,12 +4,34 @@ Definition of Deep Models and Loss Functions
 from collections import OrderedDict
 import sys
 
+import numpy as np
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+from torch.utils.data import Dataset
 
 sys.path.append('../')
 from util.cfg import cfg
+
+
+class ZhihuLiveDataset(Dataset):
+
+    def __init__(self, X, y, transform=None):
+        self.data = X
+        self.labels = y
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.labels)
+
+    def __getitem__(self, idx):
+        sample = {'data': self.data.iloc[idx - 1].as_matrix().astype(np.float32),
+                  'label': self.labels.iloc[idx - 1].as_matrix().astype(np.float32)}
+
+        if self.transform:
+            sample = self.transform(sample)
+
+        return sample
 
 
 class MTLoss(nn.Module):
@@ -39,9 +61,9 @@ class Branch(nn.Module):
         return self.bf2(F.tanh(self.bf1(x)))
 
 
-class MTBDNN(nn.Module):
+class MTNet(nn.Module):
     def __init__(self, K=2):
-        super(MTBDNN, self).__init__()
+        super(MTNet, self).__init__()
         self.K = K
         self.layers = nn.Sequential(OrderedDict([
             ('fc1', nn.Sequential(nn.Linear(23, 16),
@@ -57,9 +79,7 @@ class MTBDNN(nn.Module):
 
     def forward(self, x):
         out = torch.zeros([cfg['batch_size'], 1])
-
-        if torch.cuda.is_available():
-            out = out.cuda()
+        out = out.to(torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
         for idx, module in self.layers.named_children():
             x = F.tanh(module(x))

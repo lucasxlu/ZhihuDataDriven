@@ -22,12 +22,13 @@ from torch.optim import lr_scheduler
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.optim as optim
-from torch.autograd import Variable
 
 sys.path.append('../')
 from util.cfg import cfg
 from util.zhihu_util import mkdirs_if_not_exist
-from analysis.models import MTBDNN, MLP
+from analysis.models import MLP, MTNet, ZhihuLiveDataset
+
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def split_train_test(excel_path, dl=True):
@@ -133,41 +134,21 @@ def feature_selection(X, y, k=15):
     return X, y
 
 
-def train_and_test_mtb_dnns(train, test, train_Y, test_Y, epoch=100):
+def train_and_test_mtnet(train, test, train_Y, test_Y, epoch=100):
     """
-    train and test with MTB-DNN
+    train and test with MTNet
     :param train:
     :param test:
     :param train_Y:
     :param test_Y:
     :return:
     """
-
-    class ZhihuLiveDataset(Dataset):
-
-        def __init__(self, X, y, transform=None):
-            self.data = X
-            self.labels = y
-            self.transform = transform
-
-        def __len__(self):
-            return len(self.labels)
-
-        def __getitem__(self, idx):
-            sample = {'data': self.data.iloc[idx - 1].as_matrix().astype(np.float32),
-                      'label': self.labels.iloc[idx - 1].as_matrix().astype(np.float32)}
-
-            if self.transform:
-                sample = self.transform(sample)
-
-            return sample
-
     trainloader = torch.utils.data.DataLoader(ZhihuLiveDataset(train, train_Y), batch_size=cfg['batch_size'],
                                               shuffle=True, num_workers=4)
     testloader = torch.utils.data.DataLoader(ZhihuLiveDataset(test, test_Y), batch_size=cfg['batch_size'],
                                              shuffle=False, num_workers=4)
 
-    mtbdnn = MTBDNN(K=3)
+    mtbdnn = MTNet(K=3)
     print(mtbdnn)
     # mlp = MLP()
     criterion = nn.MSELoss()
@@ -177,16 +158,14 @@ def train_and_test_mtb_dnns(train, test, train_Y, test_Y, epoch=100):
     for epoch in range(epoch):
 
         running_loss = 0.0
-        for i, data_batch in enumerate(trainloader):
+        for i, data_batch in enumerate(trainloader, 0):
             # learning_rate_scheduler.step()
             inputs, labels = data_batch['data'], data_batch['label']
 
-            inputs, labels = Variable(inputs, requires_grad=True), Variable(labels)
-            if torch.cuda.is_available():
-                inputs = inputs.cuda()
-                labels = labels.cuda()
-                mtbdnn = mtbdnn.cuda()
-                # mlp = mlp.cuda()
+            inputs = inputs.to(DEVICE)
+            labels = labels.to(DEVICE)
+            mtbdnn = mtbdnn.to(DEVICE)
+            # mlp = mlp.to(DEVICE)
 
             optimizer.zero_grad()
 
@@ -216,14 +195,13 @@ def train_and_test_mtb_dnns(train, test, train_Y, test_Y, epoch=100):
     gt_labels = []
     for data_batch in testloader:
         inputs, labels = data_batch['data'], data_batch['label']
-        if torch.cuda.is_available():
-            inputs = inputs.cuda()
-            mtbdnn = mtbdnn.cuda()
-            # mlp = mlp.cuda()
+        inputs = inputs.to(DEVICE)
+        mtbdnn = mtbdnn.to(DEVICE)
+        # mlp = mlp.to(DEVICE)
 
         # outputs = mlp.forward(Variable(inputs))
-        outputs = mtbdnn.forward(Variable(inputs))
-        predicted_labels += outputs.cpu().data.numpy().tolist()
+        outputs = mtbdnn.forward(inputs)
+        predicted_labels += outputs.to("cpu").data.numpy().tolist()
         gt_labels += labels.numpy().tolist()
 
     mae_lr = round(mean_absolute_error(np.array(gt_labels), np.array(predicted_labels)), 4)
@@ -232,56 +210,7 @@ def train_and_test_mtb_dnns(train, test, train_Y, test_Y, epoch=100):
     print('===============The Root Mean Square Error of MTB-DNN is {0}===================='.format(rmse_lr))
 
 
-def predict_score(zhihu_live_id):
-    """
-    predict a Zhihu Live's score with ML model
-    :Note: Normalization need to be done!!!
-    :param zhihu_live_id:
-    :return:
-    """
-    req_url = 'https://api.zhihu.com/lives/%s' % str(zhihu_live_id).strip()
-    headers = {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Host': 'api.zhihu.com',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
-        'Upgrade-Insecure-Requests': '1'
-    }
-    cookies = dict(
-        cookies_are='')
-    response = requests.get(req_url, headers=headers, cookies=cookies)
-    if response.status_code == 200:
-        live = response.json()
-        print(live)
-        if live['review']['count'] < 18:
-            print('The number of scored people is scarce, please buy this Live carefully!')
-        else:
-            if os.path.exists('./model/zhihu_live_mlp.pth'):
-                net = MLP()
-                net.load_state_dict(torch.load('./model/zhihu_live_mlp.pth'))
-                input = np.array([live['duration'], live['reply_message_count'], 1 if live['source'] == 'admin' else 0,
-                                  int(live['purchasable']), int(live['is_refundable']), int(live['has_authenticated']),
-                                  0 if live['speaker']['member']['user_type'] == 'organization' else 1,
-                                  live['speaker']['member']['gender'], len(live['speaker']['member']['badge']),
-                                  live['speaker_audio_message_count'], live['attachment_count'], live['liked_num'],
-                                  int(live['is_commercial']), live['audition_message_count'],
-                                  int(live['is_audition_open']),
-                                  live['seats']['taken'], live['seats']['max'], live['speaker_message_count'],
-                                  live['fee']['amount'],
-                                  live['fee']['original_price'] / 100, int(live['has_audition']),
-                                  int(live['has_feedback']), live['review']['count']], dtype=np.float32)
-                if torch.cuda.is_available():
-                    net = net.cuda()
-                    input = torch.from_numpy(input).cuda()
-
-                score = net.forward(input)
-                print('Score is %d' % score)
-    else:
-        print(response.status_code)
-
-
 if __name__ == '__main__':
     train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", False)
-    train_and_test_model(train_set, test_set, train_label, test_label)
-    # train_and_test_mtb_dnns(train_set, test_set, train_label, test_label, 30)
-
-    # predict_score('788099469471121408')
+    # train_and_test_model(train_set, test_set, train_label, test_label)
+    train_and_test_mtnet(train_set, test_set, train_label, test_label, 30)
