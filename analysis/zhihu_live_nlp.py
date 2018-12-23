@@ -1,17 +1,16 @@
-import sys
 import os
+import sys
 
 import numpy as np
 import pandas as pd
-
+import jieba.analyse
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
-from torch.utils.data import Dataset
+from sklearn.model_selection import train_test_split
 from torchtext import data
 
 sys.path.append('../')
@@ -41,9 +40,8 @@ def read_corpus():
         df = pd.read_excel(os.path.join(COMMENTS_DIR, xlsx), encoding='GBK', index_col=None)
         df = df.dropna(how='any')
 
-        # reverse due to wrong code in crawler T_T
-        documents += df['score'].tolist()
-        rates += df['content'].tolist()
+        documents += df['content'].tolist()
+        rates += df['score'].tolist()
 
     print('tokenizer starts working...')
 
@@ -157,30 +155,42 @@ def get_d2v(words_list, labels, train=True):
     return np.array(features), np.array(labels)
 
 
-class DoubanCommentsDataset(Dataset):
+def cal_hot_words():
     """
-    Douban Comments Dataset
+    calculate TOP-K hot words by TextRank
+    :return:
     """
+    documents = []
 
-    def __init__(self, X, y):
-        self.X = X
-        self.y = y
+    print('loading corpus...')
+    for xlsx in os.listdir(COMMENTS_DIR):
+        print('reading Excel: %s ...' % xlsx)
+        df = pd.read_excel(os.path.join(COMMENTS_DIR, xlsx), encoding='GBK', index_col=None)
+        df = df.dropna(how='any')
 
-    def __len__(self):
-        return len(self.y)
+        documents += [str(_) for _ in df['content'].tolist()]
 
-    def __getitem__(self, idx):
-        sample = {'ft': self.X[idx], 'senti': self.y[idx]}
+    words_and_weights = jieba.analyse.textrank(' '.join(documents), topK=50, withWeight=True, allowPOS=('ns', 'n',
+                                                                                                        'vn', 'v'))
+    words, weights = [], []
+    for _ in words_and_weights:
+        words.append(_[0])
+        weights.append(_[1])
 
-        return sample
+    return words, weights
 
 
 if __name__ == '__main__':
+    # words, weights = cal_hot_words()
+    # print(words)
+    # print(weights)
+
     texts, rates = read_corpus()
+    print("There are {0} records in total...".format(len(rates)))
     X, y = get_w2v(texts, rates, train=False)
 
     print('start training sentiment classifier...')
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
     clf.fit(X_train, y_train)
     mkdirs_if_not_exist('./model')

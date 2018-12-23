@@ -33,6 +33,24 @@ class ZhihuLiveDataset(Dataset):
         return sample
 
 
+class DoubanCommentsDataset(Dataset):
+    """
+    Douban Comments Dataset
+    """
+
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
+
+    def __len__(self):
+        return len(self.y)
+
+    def __getitem__(self, idx):
+        sample = {'ft': self.X[idx], 'senti': self.y[idx]}
+
+        return sample
+
+
 class MTLoss(nn.Module):
     """
     Loss function for MTB-DNN
