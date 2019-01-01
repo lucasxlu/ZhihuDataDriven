@@ -11,7 +11,7 @@ from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
-from torchtext import data
+import fasttext
 
 sys.path.append('../')
 from util.zhihu_util import mkdirs_if_not_exist
@@ -58,11 +58,6 @@ def read_corpus():
         texts.append(words_in_doc)
 
     return texts, rates
-
-
-def load_torchtext():
-    texts = data.Field(sequential=True, lower=False, batch_first=True, fix_length=30)
-    labels = data.LabelField(sequential=False)
 
 
 def corpus_to_tfidf_vector(texts, rate_label):
@@ -180,22 +175,67 @@ def cal_hot_words():
     return words, weights
 
 
+class FastTextSentimentClassifier:
+    def __init__(self):
+        self.excel_dir = COMMENTS_DIR
+
+    def prepare_fast_text_data(self):
+        documents = []
+        rates = []
+
+        for xlsx in os.listdir(self.excel_dir):
+            print('reading Excel: %s ...' % xlsx)
+            df = pd.read_excel(os.path.join(COMMENTS_DIR, xlsx), encoding='GBK', index_col=None)
+            df = df.dropna(how='any')
+
+            documents += df['content'].tolist()
+            rates += df['score'].tolist()
+
+        X_train, X_test, y_train, y_test = train_test_split(documents, rates, test_size=0.2, random_state=42,
+                                                            stratify=rates)
+        train_lines = []
+        for i in range(len(X_train)):
+            line = '__label__' + str(y_train[i]) + ' , ' + X_train[i] + '\n'
+            train_lines.append(line)
+
+        with open('./train.txt', mode='wt', encoding='utf-8') as f:
+            f.write(str(train_lines))
+
+        test_lines = []
+        for i in range(len(X_test)):
+            line = '__label__' + str(y_test[i]) + ' , ' + X_test[i] + '\n'
+            test_lines.append(line)
+
+        with open('./test.txt', mode='wt', encoding='utf-8') as f:
+            f.write(str(test_lines))
+
+    def train_and_eval(self):
+        classifier = fasttext.supervised('./train.txt', 'model', label_prefix='__label__')
+        result = classifier.test('./test.txt')
+        print('P@1:', result.precision)
+        print('R@1:', result.recall)
+
+
 if __name__ == '__main__':
+    fast_text_sentiment_classifier = FastTextSentimentClassifier()
+    fast_text_sentiment_classifier.prepare_fast_text_data()
+    fast_text_sentiment_classifier.train_and_eval()
+
     # words, weights = cal_hot_words()
     # print(words)
     # print(weights)
 
-    texts, rates = read_corpus()
-    print("There are {0} records in total...".format(len(rates)))
-    X, y = get_w2v(texts, rates, train=False)
-
-    print('start training sentiment classifier...')
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
-    clf.fit(X_train, y_train)
-    mkdirs_if_not_exist('./model')
-    joblib.dump(clf, './model/rfc.pkl')
-
-    cm = confusion_matrix(y_test, clf.predict(X_test))
-    print(cm)
-    print('finish training sentiment classifier...')
+    # texts, rates = read_corpus()
+    # print("There are {0} records in total...".format(len(rates)))
+    # X, y = get_w2v(texts, rates, train=False)
+    #
+    # print('start training sentiment classifier...')
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    # clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
+    # clf.fit(X_train, y_train)
+    # mkdirs_if_not_exist('./model')
+    # joblib.dump(clf, './model/rfc.pkl')
+    #
+    # cm = confusion_matrix(y_test, clf.predict(X_test))
+    # print(cm)
+    # print('finish training sentiment classifier...')
