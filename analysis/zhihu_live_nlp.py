@@ -199,7 +199,7 @@ class FastTextSentimentClassifier:
             train_lines.append(line)
 
         with open('./train.txt', mode='wt', encoding='utf-8') as f:
-            f.write(str(train_lines))
+            f.write("".join(train_lines))
 
         test_lines = []
         for i in range(len(X_test)):
@@ -207,7 +207,7 @@ class FastTextSentimentClassifier:
             test_lines.append(line)
 
         with open('./test.txt', mode='wt', encoding='utf-8') as f:
-            f.write(str(test_lines))
+            f.write("".join(test_lines))
 
     def train_and_eval(self):
         classifier = fasttext.supervised('./train.txt', 'model', label_prefix='__label__')
