@@ -195,7 +195,7 @@ class FastTextSentimentClassifier:
                                                             stratify=rates)
         train_lines = []
         for i in range(len(X_train)):
-            line = '__label__{0} , {1}\n'.format(int(y_train[i]), X_train[i])
+            line = '__label__{0} {1}\n'.format(int(y_train[i]), X_train[i])
             train_lines.append(line)
 
         with open('./train.txt', mode='wt', encoding='utf-8') as f:
@@ -203,14 +203,14 @@ class FastTextSentimentClassifier:
 
         test_lines = []
         for i in range(len(X_test)):
-            line = '__label__{0} , {1}\n'.format(int(y_test[i]), X_test[i])
+            line = '__label__{0} {1}\n'.format(int(y_test[i]), X_test[i])
             test_lines.append(line)
 
         with open('./test.txt', mode='wt', encoding='utf-8') as f:
             f.write("".join(test_lines))
 
     def train_and_eval(self):
-        classifier = fasttext.supervised('./train.txt', 'model', label_prefix='__label__')
+        classifier = fasttext.supervised('./train.txt', 'model', label_prefix='__label__', thread=4)
         result = classifier.test('./test.txt')
         print('P@1:', result.precision)
         print('R@1:', result.recall)
