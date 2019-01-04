@@ -210,7 +210,7 @@ class FastTextSentimentClassifier:
             f.write("".join(test_lines))
 
     def train_and_eval(self):
-        classifier = fasttext.supervised('./train.txt', 'fast_text', label_prefix="__label__", thread=4)
+        classifier = fasttext.supervised('./train.txt', 'fast_text', label_prefix="__label__", thread=4, epoch=100)
         result = classifier.test('./test.txt')
         print('P@1:', result.precision)
         print('R@1:', result.recall)
@@ -218,7 +218,7 @@ class FastTextSentimentClassifier:
 
 if __name__ == '__main__':
     fast_text_sentiment_classifier = FastTextSentimentClassifier()
-    # fast_text_sentiment_classifier.prepare_fast_text_data()
+    fast_text_sentiment_classifier.prepare_fast_text_data()
     fast_text_sentiment_classifier.train_and_eval()
 
     # words, weights = cal_hot_words()
