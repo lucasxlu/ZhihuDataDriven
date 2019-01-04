@@ -195,7 +195,7 @@ class FastTextSentimentClassifier:
                                                             stratify=rates)
         train_lines = []
         for i in range(len(X_train)):
-            line = '__label__{0} {1}\n'.format(int(y_train[i]), " ".join(jieba.cut(str(X_train[i]).strip())))
+            line = '{0}\t__label__{1}\n'.format(" ".join(jieba.cut(str(X_train[i]).strip())), int(y_train[i]))
             train_lines.append(line)
 
         with open('./train.txt', mode='wt', encoding='utf-8') as f:
@@ -203,14 +203,14 @@ class FastTextSentimentClassifier:
 
         test_lines = []
         for i in range(len(X_test)):
-            line = '__label__{0} {1}\n'.format(int(y_test[i]), " ".join(jieba.cut(str(X_test[i]).strip())))
+            line = '{0}\t__label__{1}\n'.format(" ".join(jieba.cut(str(X_test[i]).strip())), int(y_test[i]))
             test_lines.append(line)
 
         with open('./test.txt', mode='wt', encoding='utf-8') as f:
             f.write("".join(test_lines))
 
     def train_and_eval(self):
-        classifier = fasttext.supervised('./train.txt', 'ftmodel', label_prefix='__label__', thread=4)
+        classifier = fasttext.supervised('./train.txt', 'fast_text', label_prefix="__label__", thread=4)
         result = classifier.test('./test.txt')
         print('P@1:', result.precision)
         print('R@1:', result.recall)
@@ -218,7 +218,7 @@ class FastTextSentimentClassifier:
 
 if __name__ == '__main__':
     fast_text_sentiment_classifier = FastTextSentimentClassifier()
-    fast_text_sentiment_classifier.prepare_fast_text_data()
+    # fast_text_sentiment_classifier.prepare_fast_text_data()
     fast_text_sentiment_classifier.train_and_eval()
 
     # words, weights = cal_hot_words()
