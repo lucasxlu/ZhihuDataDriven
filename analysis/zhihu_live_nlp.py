@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 import fasttext
+import jieba.analyse
 
 sys.path.append('../')
 from util.zhihu_util import mkdirs_if_not_exist
@@ -46,7 +47,6 @@ def read_corpus():
     print('tokenizer starts working...')
 
     texts = []
-    import jieba.analyse
 
     jieba.load_userdict('./userdict.txt')
     jieba.analyse.set_stop_words('./stopwords.txt')
@@ -195,7 +195,7 @@ class FastTextSentimentClassifier:
                                                             stratify=rates)
         train_lines = []
         for i in range(len(X_train)):
-            line = '__label__{0} {1}\n'.format(int(y_train[i]), X_train[i])
+            line = '__label__{0} {1}\n'.format(int(y_train[i]), " ".join(jieba.cut(str(X_train[i]).strip())))
             train_lines.append(line)
 
         with open('./train.txt', mode='wt', encoding='utf-8') as f:
@@ -203,7 +203,7 @@ class FastTextSentimentClassifier:
 
         test_lines = []
         for i in range(len(X_test)):
-            line = '__label__{0} {1}\n'.format(int(y_test[i]), X_test[i])
+            line = '__label__{0} {1}\n'.format(int(y_test[i]), " ".join(jieba.cut(str(X_test[i]).strip())))
             test_lines.append(line)
 
         with open('./test.txt', mode='wt', encoding='utf-8') as f:
