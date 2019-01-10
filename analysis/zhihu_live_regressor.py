@@ -14,6 +14,8 @@ from sklearn.svm import SVR
 from sklearn.externals import joblib
 from sklearn.model_selection import train_test_split
 
+import xgboost as xgb
+
 import torch
 from torch.optim import lr_scheduler
 from torch.utils.data import Dataset, DataLoader
@@ -129,6 +131,41 @@ def train_and_test_model(train, test, train_Y, test_Y):
     out_result(predicted_score, test_Y)
 
 
+def train_and_test_xgboost(train, test, train_Y, test_Y):
+    """
+    train and test XGBoost
+    :param train:
+    :param test:
+    :param train_Y:
+    :param test_Y:
+    :return:
+    """
+    mkdirs_if_not_exist('./xgb')
+
+    zhihu_live_train = []
+    for i in range(len(train_Y)):
+        zhihu_live_train.append("%f %s" % (np.array(train_Y).ravel().tolist()[i], " ".join(train[i].tolist())))
+
+    with open('./xgb/ZhihuLive.txt.train', mode='wt', encoding='utf-8') as f:
+        f.write("\r\n".join(zhihu_live_train))
+
+    zhihu_live_test = []
+    for i in range(len(test_Y)):
+        zhihu_live_test.append(str(np.array(test_Y).ravel().tolist()[i]) + " " + " ".join(test[i]))
+
+    with open('./xgb/ZhihuLive.txt.test', mode='wt', encoding='utf-8') as f:
+        f.write("\r\n".join(zhihu_live_test))
+
+    dtrain = xgb.DMatrix('./xgb/ZhihuLive.txt.train')
+    dtest = xgb.DMatrix('./xgb/ZhihuLive.txt.test')
+    # specify parameters via map
+    param = {'max_depth': 2, 'eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    num_round = 2
+    bst = xgb.train(param, dtrain, num_round)
+    # make prediction
+    preds = bst.predict(dtest)
+
+
 def feature_selection(X, y, k=15):
     """
     feature selection
@@ -221,4 +258,5 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
 if __name__ == '__main__':
     train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", fs=False)
     # train_and_test_model(train_set, test_set, train_label, test_label)
-    train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=15)
+    # train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=15)
+    train_and_test_xgboost(train_set, test_set, train_label, test_label)
