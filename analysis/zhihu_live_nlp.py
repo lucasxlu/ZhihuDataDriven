@@ -210,13 +210,13 @@ class FastTextSentimentClassifier:
             f.write("".join(test_lines))
 
     def train_and_eval(self):
-        classifier = fasttext.supervised('./train.txt', 'fast_text', label_prefix="__label__", thread=4, epoch=100)
+        classifier = fasttext.supervised('./train.txt', 'fastTextClassifier', label_prefix="__label__", thread=4, epoch=100)
         result = classifier.test('./test.txt')
         print('P@1:', result.precision)
         print('R@1:', result.recall)
 
     def word_representation(self, text):
-        model = fasttext.skipgram('train.txt', 'model')
+        model = fasttext.skipgram('train.txt', 'fastTextRepr')
 
         return model[text]
 
