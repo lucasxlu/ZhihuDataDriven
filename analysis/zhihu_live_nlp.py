@@ -6,10 +6,10 @@ import pandas as pd
 import jieba.analyse
 from gensim.models import Word2Vec, Doc2Vec
 from gensim.models.doc2vec import TaggedDocument
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split
 import fasttext
 import jieba.analyse
@@ -278,13 +278,15 @@ if __name__ == '__main__':
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
-    print('start training sentiment classifier...')
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
+    print('start training regressor...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    clf = RandomForestRegressor(n_estimators=100, max_depth=2, random_state=0)
     clf.fit(X_train, y_train)
     mkdirs_if_not_exist('./model')
     joblib.dump(clf, './model/rfc.pkl')
 
-    cm = confusion_matrix(y_test, clf.predict(X_test))
-    print(cm)
-    print('finish training sentiment classifier...')
+    mae_lr = round(mean_absolute_error(y_test, clf.predict(X_test)), 4)
+    rmse_lr = round(np.math.sqrt(mean_squared_error(y_test, clf.predict(X_test))), 4)
+    print('===============The Mean Absolute Error is {0}===================='.format(mae_lr))
+    print('===============The Root Mean Square Error is {0}===================='.format(rmse_lr))
+    print('finish training regressor...')
