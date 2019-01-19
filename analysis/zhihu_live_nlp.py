@@ -163,7 +163,7 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
     features = list()
     labels = list()
 
-    for i in range(len(texts)):
+    for i in range(len(rate_label)):
         w2v = []
         for tx in texts[i]:
             try:
@@ -318,7 +318,7 @@ if __name__ == '__main__':
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
-    print(y)
+    print(X)
 
     print('start training classifier...')
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
@@ -329,12 +329,12 @@ if __name__ == '__main__':
     X_train, X_test = X_train[0:100], X_test[0:100]
     y_train, y_test = y_train[0:100], y_test[0:100]
 
-    clr = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
-    clr.fit(X_train, y_train)
+    rf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
+    rf.fit(X_train, y_train)
     mkdirs_if_not_exist('./model')
-    joblib.dump(clr, './model/rfc.pkl')
+    joblib.dump(rf, './model/rfc.pkl')
 
-    y_pred = clr.predict(X_test)
+    y_pred = rf.predict(X_test)
     cm = confusion_matrix(y_test, y_pred)
     print(cm)
 
