@@ -60,6 +60,42 @@ def read_corpus():
     return texts, rates
 
 
+def get_comments_and_live_score():
+    documents = []
+    rates = []
+
+    df = pd.read_excel("../spider/ZhihuLiveDB.xlsx")
+    df = df[df['review_count'] >= 11]
+
+    mp = {}
+    for i in range(len(df)):
+        mp[df['id'][i]] = df['review_score'][i]
+
+    print('loading corpus...')
+    for xlsx in mp.keys():
+        print('reading Excel: %s ...' % xlsx)
+        df = pd.read_excel(os.path.join(COMMENTS_DIR, '{0}.xlsx'.format(xlsx)), encoding='GBK', index_col=None)
+        df = df.dropna(how='any')
+
+        documents += df['content'].tolist()
+        rates += df['score'].tolist()
+
+    print('tokenizer starts working...')
+
+    texts = []
+
+    jieba.load_userdict('./userdict.txt')
+    jieba.analyse.set_stop_words('./stopwords.txt')
+    stopwords = [_.replace('\n', '') for _ in open('./stopwords.txt', encoding='utf-8').readlines()]
+
+    for doc in documents:
+        words_in_doc = list(jieba.cut(str(doc).strip()))
+        words_in_doc = list(filter(lambda w: w not in STOP_DENOTATION + stopwords, words_in_doc))
+        texts.append(words_in_doc)
+
+    return texts, rates
+
+
 def corpus_to_tfidf_vector(texts, rate_label):
     """
     convert segmented corpus in a list into TF-IDF array
