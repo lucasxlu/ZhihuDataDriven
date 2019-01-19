@@ -60,44 +60,44 @@ def read_corpus():
     return texts, rates
 
 
-def get_comments_and_live_score():
-    """
-    get comments and ZhiHuLive scores
-    :return:
-    """
-    documents = []
-    rates = []
-
-    live = pd.read_excel("../spider/ZhihuLiveDB.xlsx")
-    live = live[live['review_count'] >= 11]
-
-    mp = {}
-    for i in range(len(live)):
-        mp[live['id'].tolist()[i]] = live['review_score'].tolist()[i]
-
-    print('loading corpus...')
-    for xlsx, score in mp.items():
-        print('reading Excel: %s ...' % xlsx)
-        df = pd.read_excel(os.path.join(COMMENTS_DIR, '{0}.xlsx'.format(xlsx)), encoding='GBK', index_col=None)
-        df = df.dropna(how='any')
-
-        documents += df['content'].tolist()
-        rates.append(score)
-
-    print('tokenizer starts working...')
-
-    texts = []
-
-    jieba.load_userdict('./userdict.txt')
-    jieba.analyse.set_stop_words('./stopwords.txt')
-    stopwords = [_.replace('\n', '') for _ in open('./stopwords.txt', encoding='utf-8').readlines()]
-
-    for doc in documents:
-        words_in_doc = list(jieba.cut(str(doc).strip()))
-        words_in_doc = list(filter(lambda w: w not in STOP_DENOTATION + stopwords, words_in_doc))
-        texts.append(words_in_doc)
-
-    return texts, rates
+# def get_comments_and_live_score():
+#     """
+#     get comments and ZhiHuLive scores
+#     :return:
+#     """
+#     documents = []
+#     rates = []
+#
+#     live = pd.read_excel("../spider/ZhihuLiveDB.xlsx")
+#     live = live[live['review_count'] >= 11]
+#
+#     mp = {}
+#     for i in range(len(live)):
+#         mp[live['id'].tolist()[i]] = live['review_score'].tolist()[i]
+#
+#     print('loading corpus...')
+#     for xlsx, score in mp.items():
+#         print('reading Excel: %s ...' % xlsx)
+#         df = pd.read_excel(os.path.join(COMMENTS_DIR, '{0}.xlsx'.format(xlsx)), encoding='GBK', index_col=None)
+#         df = df.dropna(how='any')
+#
+#         documents += df['content'].tolist()
+#         rates.append(score)
+#
+#     print('tokenizer starts working...')
+#
+#     texts = []
+#
+#     jieba.load_userdict('./userdict.txt')
+#     jieba.analyse.set_stop_words('./stopwords.txt')
+#     stopwords = [_.replace('\n', '') for _ in open('./stopwords.txt', encoding='utf-8').readlines()]
+#
+#     for doc in documents:
+#         words_in_doc = list(jieba.cut(str(doc).strip()))
+#         words_in_doc = list(filter(lambda w: w not in STOP_DENOTATION + stopwords, words_in_doc))
+#         texts.append(words_in_doc)
+#
+#     return texts, rates
 
 
 def corpus_to_tfidf_vector(texts, rate_label):
@@ -313,15 +313,15 @@ if __name__ == '__main__':
     # fast_text_classifier.train_word_repr()
     # print(fast_text_classifier.get_word_repr("知乎"))
 
-    texts, rates = get_comments_and_live_score()
+    texts, rates = read_corpus()
 
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
     print(y)
 
-    print('start training regressor...')
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    print('start training classifier...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     print(X_train.shape)
     print(y_train.shape)
@@ -329,14 +329,13 @@ if __name__ == '__main__':
     X_train, X_test = X_train[0:100], X_test[0:100]
     y_train, y_test = y_train[0:100], y_test[0:100]
 
-    clr = RandomForestRegressor(n_estimators=100, max_depth=2, random_state=0)
+    clr = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
     clr.fit(X_train, y_train)
     mkdirs_if_not_exist('./model')
     joblib.dump(clr, './model/rfc.pkl')
 
     y_pred = clr.predict(X_test)
-    mae_lr = round(mean_absolute_error(y_test, y_pred), 4)
-    rmse_lr = round(np.math.sqrt(mean_squared_error(y_test, y_pred)), 4)
-    print('===============The Mean Absolute Error is {0}===================='.format(mae_lr))
-    print('===============The Root Mean Square Error is {0}===================='.format(rmse_lr))
-    print('finish training regressor...')
+    cm = confusion_matrix(y_test, y_pred)
+    print(cm)
+
+    print('finish training classifier...')
