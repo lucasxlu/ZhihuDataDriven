@@ -61,15 +61,19 @@ def read_corpus():
 
 
 def get_comments_and_live_score():
+    """
+    get comments and ZhiHuLive scores
+    :return:
+    """
     documents = []
     rates = []
 
-    df = pd.read_excel("../spider/ZhihuLiveDB.xlsx")
-    df = df[df['review_count'] >= 11]
+    live = pd.read_excel("../spider/ZhihuLiveDB.xlsx")
+    live = live[live['review_count'] >= 11]
 
     mp = {}
-    for i in range(len(df)):
-        mp[df['id'].tolist()[i]] = df['review_score'].tolist()[i]
+    for i in range(len(live)):
+        mp[live['id'].tolist()[i]] = live['review_score'].tolist()[i]
 
     print('loading corpus...')
     for xlsx, score in mp.items():
@@ -302,7 +306,7 @@ class FastTextClassifier:
 
 
 if __name__ == '__main__':
-    fast_text_classifier = FastTextClassifier()
+    # fast_text_classifier = FastTextClassifier()
     # fast_text_classifier.prepare_fast_text_data()
     # fast_text_classifier.train_and_eval()
 
