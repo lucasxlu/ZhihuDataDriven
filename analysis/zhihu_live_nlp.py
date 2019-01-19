@@ -72,13 +72,13 @@ def get_comments_and_live_score():
         mp[df['id'][i]] = df['review_score'][i]
 
     print('loading corpus...')
-    for xlsx in mp.keys():
+    for xlsx, score in mp.items():
         print('reading Excel: %s ...' % xlsx)
         df = pd.read_excel(os.path.join(COMMENTS_DIR, '{0}.xlsx'.format(xlsx)), encoding='GBK', index_col=None)
         df = df.dropna(how='any')
 
         documents += df['content'].tolist()
-        rates += df['score'].tolist()
+        rates.append(score)
 
     print('tokenizer starts working...')
 
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     # fast_text_classifier.train_word_repr()
     # print(fast_text_classifier.get_word_repr("知乎"))
 
-    texts, rates = read_corpus()
+    texts, rates = get_comments_and_live_score()
 
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
