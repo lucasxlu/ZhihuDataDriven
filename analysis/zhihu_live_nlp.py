@@ -280,13 +280,18 @@ if __name__ == '__main__':
 
     print('start training regressor...')
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    clf = RandomForestRegressor(n_estimators=100, max_depth=2, random_state=0)
-    clf.fit(X_train, y_train)
-    mkdirs_if_not_exist('./model')
-    joblib.dump(clf, './model/rfc.pkl')
 
-    mae_lr = round(mean_absolute_error(y_test, clf.predict(X_test)), 4)
-    rmse_lr = round(np.math.sqrt(mean_squared_error(y_test, clf.predict(X_test))), 4)
+    print(X_train.shape)
+    print(y_train.shape)
+
+    clr = RandomForestRegressor(n_estimators=100, max_depth=2, random_state=0)
+    clr.fit(X_train, y_train)
+    mkdirs_if_not_exist('./model')
+    joblib.dump(clr, './model/rfc.pkl')
+
+    y_pred = clr.predict(X_test)
+    mae_lr = round(mean_absolute_error(y_test, y_pred), 4)
+    rmse_lr = round(np.math.sqrt(mean_squared_error(y_test, y_pred)), 4)
     print('===============The Mean Absolute Error is {0}===================='.format(mae_lr))
     print('===============The Root Mean Square Error is {0}===================='.format(rmse_lr))
     print('finish training regressor...')
