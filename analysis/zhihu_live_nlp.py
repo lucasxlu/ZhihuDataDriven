@@ -318,6 +318,12 @@ if __name__ == '__main__':
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
+    l = len(X[0])
+    print(l)
+    for x in X:
+        if len(x) != l:
+            print(len(x))
+
     print(X.shape)
 
     print('start training classifier...')
