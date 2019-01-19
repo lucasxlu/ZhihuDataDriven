@@ -136,7 +136,7 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
         features.append(f)
         labels.append(rate_label[i])
 
-    return np.array(features), np.array(labels)
+    return np.array(features), np.array(labels).ravel()
 
 
 def get_d2v(words_list, labels, train=True):
@@ -278,11 +278,16 @@ if __name__ == '__main__':
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
+    print(y)
+
     print('start training regressor...')
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     print(X_train.shape)
     print(y_train.shape)
+
+    X_train, X_test = X_train[0:100], X_test[0:100]
+    y_train, y_test = y_train[0:100], y_test[0:100]
 
     clr = RandomForestRegressor(n_estimators=100, max_depth=2, random_state=0)
     clr.fit(X_train, y_train)
