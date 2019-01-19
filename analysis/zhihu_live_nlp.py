@@ -215,11 +215,18 @@ class FastTextSentimentClassifier:
         print('P@1:', result.precision)
         print('R@1:', result.recall)
 
+    def word_representation(self, text):
+        model = fasttext.skipgram('train.txt', 'model')
+
+        return model[text]
+
 
 if __name__ == '__main__':
     fast_text_sentiment_classifier = FastTextSentimentClassifier()
     fast_text_sentiment_classifier.prepare_fast_text_data()
-    fast_text_sentiment_classifier.train_and_eval()
+    # fast_text_sentiment_classifier.train_and_eval()
+
+    print(fast_text_sentiment_classifier.word_representation("老师"))
 
     # words, weights = cal_hot_words()
     # print(words)
