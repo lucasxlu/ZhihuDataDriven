@@ -107,7 +107,30 @@ def get_w2v(texts, rate_label, train=True):
             except:
                 pass
 
-        # print(np.array(w2v).shape)
+        f = np.array(w2v).mean(axis=0).flatten().tolist()
+        if len(f) == W2V_DIMENSION:
+            features.append(f)
+            labels.append(rate_label[i])
+
+    return np.array(features), np.array(labels)
+
+
+def get_fast_text_repr(fastTextRepr, texts, rate_label):
+    """
+    get FastText representation
+    :return:
+    """
+    features = list()
+    labels = list()
+
+    for i in range(len(texts)):
+        w2v = []
+        for tx in texts[i]:
+            try:
+                w2v.append(fastTextRepr[tx])
+            except:
+                pass
+
         f = np.array(w2v).mean(axis=0).flatten().tolist()
         if len(f) == W2V_DIMENSION:
             features.append(f)
@@ -175,7 +198,7 @@ def cal_hot_words():
     return words, weights
 
 
-class FastTextSentimentClassifier:
+class FastTextClassifier:
     def __init__(self):
         self.excel_dir = COMMENTS_DIR
 
@@ -243,28 +266,25 @@ class FastTextSentimentClassifier:
 
 
 if __name__ == '__main__':
-    fast_text_sentiment_classifier = FastTextSentimentClassifier()
-    # fast_text_sentiment_classifier.prepare_fast_text_data()
-    # fast_text_sentiment_classifier.train_and_eval()
+    fast_text_classifier = FastTextClassifier()
+    # fast_text_classifier.prepare_fast_text_data()
+    # fast_text_classifier.train_and_eval()
 
-    fast_text_sentiment_classifier.train_word_repr()
-    print(fast_text_sentiment_classifier.get_word_repr("小姐姐"))
+    # fast_text_classifier.train_word_repr()
+    # print(fast_text_classifier.get_word_repr("知乎"))
 
-    # words, weights = cal_hot_words()
-    # print(words)
-    # print(weights)
+    texts, rates = read_corpus()
 
-    # texts, rates = read_corpus()
-    # print("There are {0} records in total...".format(len(rates)))
-    # X, y = get_w2v(texts, rates, train=False)
-    #
-    # print('start training sentiment classifier...')
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    # clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
-    # clf.fit(X_train, y_train)
-    # mkdirs_if_not_exist('./model')
-    # joblib.dump(clf, './model/rfc.pkl')
-    #
-    # cm = confusion_matrix(y_test, clf.predict(X_test))
-    # print(cm)
-    # print('finish training sentiment classifier...')
+    print("There are {0} records in total...".format(len(rates)))
+    X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
+
+    print('start training sentiment classifier...')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    clf = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0)
+    clf.fit(X_train, y_train)
+    mkdirs_if_not_exist('./model')
+    joblib.dump(clf, './model/rfc.pkl')
+
+    cm = confusion_matrix(y_test, clf.predict(X_test))
+    print(cm)
+    print('finish training sentiment classifier...')
