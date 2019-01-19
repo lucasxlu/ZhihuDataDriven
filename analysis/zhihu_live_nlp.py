@@ -176,7 +176,7 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
         features.append(f)
         labels.append(rate_label[i])
 
-    return np.array(features), np.array(labels).ravel()
+    return np.array(features), np.array(labels)
 
 
 def get_d2v(words_list, labels, train=True):
@@ -318,13 +318,10 @@ if __name__ == '__main__':
     print("There are {0} records in total...".format(len(rates)))
     X, y = get_fast_text_repr(fasttext.load_model('fastTextRepr.bin'), texts, rates)
 
-    print(X)
+    print(X.shape)
 
     print('start training classifier...')
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-
-    print(X_train.shape)
-    print(y_train.shape)
 
     X_train, X_test = X_train[0:100], X_test[0:100]
     y_train, y_test = y_train[0:100], y_test[0:100]
