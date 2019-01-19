@@ -210,23 +210,45 @@ class FastTextSentimentClassifier:
             f.write("".join(test_lines))
 
     def train_and_eval(self):
-        classifier = fasttext.supervised('./train.txt', 'fastTextClassifier', label_prefix="__label__", thread=4, epoch=100)
+        classifier = fasttext.supervised('./train.txt', 'fastTextClassifier', label_prefix="__label__", thread=4,
+                                         epoch=100)
         result = classifier.test('./test.txt')
         print('P@1:', result.precision)
         print('R@1:', result.recall)
 
-    def word_representation(self, text):
-        model = fasttext.skipgram('train.txt', 'fastTextRepr')
+    def train_word_repr(self):
+        documents = []
+
+        for xlsx in os.listdir(self.excel_dir):
+            print('reading Excel: %s ...' % xlsx)
+            df = pd.read_excel(os.path.join(COMMENTS_DIR, xlsx), encoding='GBK', index_col=None)
+            df = df.dropna(how='any')
+
+            documents += df['content'].tolist()
+
+        lines = []
+        for i in range(len(documents)):
+            line = " ".join(jieba.cut(str(documents[i]).strip()))
+            lines.append(line)
+
+        with open('./comments.txt', mode='wt', encoding='utf-8') as f:
+            f.write("".join(lines))
+
+        fasttext.skipgram('comments.txt', 'fastTextRepr')
+
+    def get_word_repr(self, text):
+        model = fasttext.load_model('fastTextRepr.bin')
 
         return model[text]
 
 
 if __name__ == '__main__':
     fast_text_sentiment_classifier = FastTextSentimentClassifier()
-    fast_text_sentiment_classifier.prepare_fast_text_data()
+    # fast_text_sentiment_classifier.prepare_fast_text_data()
     # fast_text_sentiment_classifier.train_and_eval()
 
-    print(fast_text_sentiment_classifier.word_representation("老师"))
+    fast_text_sentiment_classifier.train_word_repr()
+    print(fast_text_sentiment_classifier.get_word_repr("小姐姐"))
 
     # words, weights = cal_hot_words()
     # print(words)
