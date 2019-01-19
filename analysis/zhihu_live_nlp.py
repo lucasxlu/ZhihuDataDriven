@@ -132,9 +132,9 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
                 pass
 
         f = np.array(w2v).mean(axis=0).flatten().tolist()
-        if len(f) == W2V_DIMENSION:
-            features.append(f)
-            labels.append(rate_label[i])
+        print(f)
+        features.append(f)
+        labels.append(rate_label[i])
 
     return np.array(features), np.array(labels)
 
