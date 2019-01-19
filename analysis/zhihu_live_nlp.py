@@ -160,8 +160,8 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
     get FastText representation
     :return:
     """
-    features = list()
-    labels = list()
+    features = []
+    labels = []
 
     for i in range(len(rate_label)):
         w2v = []
@@ -171,7 +171,7 @@ def get_fast_text_repr(fastTextRepr, texts, rate_label):
             except:
                 pass
 
-        f = np.array(w2v).mean(axis=0).flatten().tolist()
+        f = np.array(w2v).mean(axis=0).ravel().tolist()
         print(f)
         features.append(f)
         labels.append(rate_label[i])
