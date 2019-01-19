@@ -69,7 +69,7 @@ def get_comments_and_live_score():
 
     mp = {}
     for i in range(len(df)):
-        mp[df['id'][i]] = df['review_score'][i]
+        mp[df['id'].tolist()[i]] = df['review_score'].tolist()[i]
 
     print('loading corpus...')
     for xlsx, score in mp.items():
