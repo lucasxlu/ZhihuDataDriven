@@ -197,7 +197,7 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
     mtnet = MTNet()
     print(mtnet)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(mtnet.parameters(), lr=0.01, weight_decay=1e-4)
+    optimizer = optim.Adam(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
     # learning_rate_scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
 
     for epoch in range(epoch):
@@ -232,6 +232,7 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
         os.makedirs(model_path_dir)
     torch.save(mtnet.state_dict(), os.path.join(model_path_dir, 'ZhihuLive_{0}.pth'.format(mtnet.__class__.__name__)))
 
+    mtnet.eval()
     predicted_labels = []
     gt_labels = []
     for data_batch in testloader:
@@ -258,5 +259,5 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
 if __name__ == '__main__':
     train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", fs=False)
     # train_and_test_model(train_set, test_set, train_label, test_label)
-    # train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=15)
-    train_and_test_xgboost(train_set, test_set, train_label, test_label)
+    train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=cfg['epoch'])
+    # train_and_test_xgboost(train_set, test_set, train_label, test_label)
