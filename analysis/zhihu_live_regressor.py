@@ -196,6 +196,11 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
 
     mtnet = MTNet()
     print(mtnet)
+
+    if torch.cuda.device_count() > 1:
+        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        mtnet = nn.DataParallel(mtnet)
+
     criterion = nn.MSELoss()
     optimizer = optim.Adam(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
     # learning_rate_scheduler = lr_scheduler.StepLR(optimizer, step_size=cfg['lr_decay_step'], gamma=0.1)
