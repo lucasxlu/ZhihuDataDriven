@@ -197,7 +197,7 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
     mtnet = MTNet()
     print(mtnet)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
+    optimizer = optim.RMSprop(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
     # learning_rate_scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
 
     for epoch in range(epoch):
