@@ -197,7 +197,6 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
                                              shuffle=False, num_workers=4)
 
     mtnet = MTNet()
-    print(mtnet)
 
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
