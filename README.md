@@ -20,11 +20,10 @@ score.
 | MLP | 0.2397 | 0.3276|
 | MTNet | 0.2255 | 0.3244 |
 
+[[ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx)] [[pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)]
 
 ## Note
 For deeper analysis, please read my article at [Zhihu](https://zhuanlan.zhihu.com/p/30514792).
 More details will be illustrated in our paper: 
 
 ```Data-driven Approach for Quality Evaluation on Knowledge Sharing Platform.```
-
-[[ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx)] [[pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)]
