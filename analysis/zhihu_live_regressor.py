@@ -197,11 +197,11 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
     mtnet = MTNet()
     print(mtnet)
     criterion = nn.MSELoss()
-    optimizer = optim.SGD(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
-    learning_rate_scheduler = lr_scheduler.StepLR(optimizer, step_size=cfg['lr_decay_step'], gamma=0.1)
+    optimizer = optim.Adam(mtnet.parameters(), lr=cfg['init_lr'], weight_decay=cfg['weight_decay'])
+    # learning_rate_scheduler = lr_scheduler.StepLR(optimizer, step_size=cfg['lr_decay_step'], gamma=0.1)
 
     for epoch in range(epoch):
-        learning_rate_scheduler.step()
+        # learning_rate_scheduler.step()
 
         running_loss = 0.0
         for i, data_batch in enumerate(trainloader, 0):
