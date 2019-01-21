@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, chi2, f_regression
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, Imputer
 from sklearn.linear_model import RidgeCV, LassoCV
@@ -111,7 +112,8 @@ def train_and_test_model(train, test, train_Y, test_Y):
 
     # model = LassoCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
     # model = RidgeCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
-    model = SVR(kernel='rbf', C=1e3, gamma=0.1)
+    # model = SVR(kernel='rbf', C=1e3, gamma=0.1)
+    model = RandomForestRegressor(max_depth=10, random_state=0, n_estimators=100)
     # model = SVR(kernel='linear', C=1e3)
     # model = SVR(kernel='poly', C=1e3, degree=2)
     # model = KNeighborsRegressor(n_neighbors=10, n_jobs=4)
