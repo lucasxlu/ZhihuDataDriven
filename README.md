@@ -12,13 +12,14 @@ score.
 ## Experimental Results
 | Model | MAE | RMSE |   
 | :---: | :---: | :---: | 
-| SVR (RBF Kernel) | 0.2252 | 0.327|
-| SVR (Linear Kernel) | 0.2257 | 0.3267|
-| SVR (Poly Kernel) | 0.2255 | 0.3268|
-| KNN | 0.2401 | 0.3275|
-| Linear Regression | 0.2354 | 0.3224|
-| MLP | 0.2397 | 0.3276|
-| MTNet | 0.2255 | 0.3244 |
+| Linear Regression | 0.2366 | 0.3229 |
+| KNN Regression | 0.2401 | 0.3275 |
+| SVR (RBF) | 0.2252 | 0.3270 |
+| SVR (Linear) | 0.2257 | 0.3267 |
+| SVR (Poly) | 0.2255 | 0.3268 |
+| Random Forest Regressor | 0.2267 | 0.3244 |
+| MLP | 0.2397 | 0.3276 |
+| MTNet | **0.2249** | 0.3235 |
 
 [[ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx)] [[pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)]
 
