@@ -7,7 +7,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, chi2, f_regression
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, Imputer
-from sklearn.linear_model import RidgeCV, LassoCV
+from sklearn.linear_model import RidgeCV, LassoCV, LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -110,10 +110,11 @@ def train_and_test_model(train, test, train_Y, test_Y):
     # model = Pipeline([('poly', PolynomialFeatures(degree=3)),
     #                   ('linear', LinearRegression(fit_intercept=False))])
 
+    # model = LinearRegression()
     # model = LassoCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
     # model = RidgeCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
     # model = SVR(kernel='rbf', C=1e3, gamma=0.1)
-    model = RandomForestRegressor(max_depth=10, random_state=0, n_estimators=100)
+    model = RandomForestRegressor()
     # model = SVR(kernel='linear', C=1e3)
     # model = SVR(kernel='poly', C=1e3, degree=2)
     # model = KNeighborsRegressor(n_neighbors=10, n_jobs=4)
@@ -122,7 +123,7 @@ def train_and_test_model(train, test, train_Y, test_Y):
     #                      batch_size=16, learning_rate='adaptive')
     model.fit(train, train_Y.values.ravel())
     mkdirs_if_not_exist('./model')
-    joblib.dump(model, './model/svr.pkl')
+    joblib.dump(model, './model/randomforest_reg.pkl')
     predicted_score = model.predict(test)
     mae_lr = round(mean_absolute_error(test_Y, predicted_score), 4)
     rmse_lr = round(np.math.sqrt(mean_squared_error(test_Y, predicted_score)), 4)
