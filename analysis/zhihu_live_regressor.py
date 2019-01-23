@@ -113,8 +113,8 @@ def train_and_test_model(train, test, train_Y, test_Y):
     # model = LinearRegression()
     # model = LassoCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
     # model = RidgeCV(alphas=[_ * 0.1 for _ in range(1, 1000, 1)])
-    # model = SVR(kernel='rbf', C=1e3, gamma=0.1)
-    model = RandomForestRegressor()
+    # model = RandomForestRegressor()
+    model = SVR(kernel='rbf')
     # model = SVR(kernel='linear', C=1e3)
     # model = SVR(kernel='poly', C=1e3, degree=2)
     # model = KNeighborsRegressor(n_neighbors=10, n_jobs=4)
@@ -123,7 +123,7 @@ def train_and_test_model(train, test, train_Y, test_Y):
     #                      batch_size=16, learning_rate='adaptive')
     model.fit(train, train_Y.values.ravel())
     mkdirs_if_not_exist('./model')
-    joblib.dump(model, './model/randomforest_reg.pkl')
+    joblib.dump(model, './model/svr.pkl')
     predicted_score = model.predict(test)
     mae_lr = round(mean_absolute_error(test_Y, predicted_score), 4)
     rmse_lr = round(np.math.sqrt(mean_squared_error(test_Y, predicted_score)), 4)
@@ -264,7 +264,7 @@ def train_and_test_mtnet(train, test, train_Y, test_Y, epoch):
 
 
 if __name__ == '__main__':
-    train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", fs=False)
-    # train_and_test_model(train_set, test_set, train_label, test_label)
-    train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=cfg['epoch'])
+    train_set, test_set, train_label, test_label = split_train_test("../spider/ZhihuLiveDB.xlsx", fs=True)
+    train_and_test_model(train_set, test_set, train_label, test_label)
+    # train_and_test_mtnet(train_set, test_set, train_label, test_label, epoch=cfg['epoch'])
     # train_and_test_xgboost(train_set, test_set, train_label, test_label)
