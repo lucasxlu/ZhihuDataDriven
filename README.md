@@ -21,7 +21,11 @@ score.
 | MLP | 0.2397 | 0.3276 |
 | MTNet | **0.2250** | **0.3216** |
 
-[[ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx)] [[pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)]
+
+## Resource
+* [ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx) 
+* [pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)
+* [Zhihu Live Comments](https://drive.google.com/file/d/1MbezeRjCy5NUkrP2p8KzHqO66fNVANue/view?usp=sharing)
 
 ## Note
 For deeper analysis, please read my article at [Zhihu](https://zhuanlan.zhihu.com/p/30514792).
