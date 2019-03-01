@@ -8,6 +8,11 @@ knowledge services, which overwhelm the platform as well.
 In our paper, we propose a data-driven method to automatically predict a Zhihu Live's
 score. 
 
+## Methods
+![Pipeline](./pipeline.png)
+
+![MTNet](./mtnet.png)
+
 
 ## Experimental Results
 | Model | MAE | RMSE |   
@@ -19,8 +24,9 @@ score.
 | SVR (Poly) | 0.2255 | 0.3268 |
 | Random Forest Regressor | 0.2267 | 0.3244 |
 | MLP | 0.2397 | 0.3276 |
-| MTNet | **0.2250** | **0.3216** |
+| **MTNet** | **0.2250** | **0.3216** |
 
+![Hot Words](./hot_words.png)
 
 ## Resource
 * [ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx) 
