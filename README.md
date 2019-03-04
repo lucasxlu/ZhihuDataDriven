@@ -6,7 +6,7 @@ however, due to the insufficient evaluation schemes, people suffer from lots of 
 knowledge services, which overwhelm the platform as well.
 
 In our paper, we propose a data-driven method to automatically predict a Zhihu Live's
-score. 
+score. For more details, please refer to our [paper](https://arxiv.org/abs/1903.00384).
 
 ## Methods
 ![Pipeline](./pipeline.png)
@@ -33,8 +33,13 @@ score.
 * [pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)
 * [Zhihu Live Comments](https://drive.google.com/file/d/1MbezeRjCy5NUkrP2p8KzHqO66fNVANue/view?usp=sharing)
 
-## Note
-For deeper analysis, please read my article at [Zhihu](https://zhuanlan.zhihu.com/p/30514792).
-More details will be illustrated in our paper: 
-
-```Data-driven Approach for Quality Evaluation on Knowledge Sharing Platform.```
+## Citation
+If you find this repository, dataset or experimental results useful in your research, please cite our paper:
+```
+@article{xu2019data,
+  title={Data-driven Approach for Quality Evaluation on Knowledge Sharing Platform},
+  author={Xu, Lu and Xiang, Jinhai and Wang, Yating and Ni, Fuchuan},
+  journal={arXiv preprint arXiv:1903.00384},
+  year={2019}
+}
+``` 
