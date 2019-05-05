@@ -29,7 +29,7 @@ score. For more details, please refer to our [paper](https://arxiv.org/abs/1903.
 ![Hot Words](./hot_words.png)
 
 ## Resource
-* [ZhiHuLiveDB](./spider/ZhihuLiveDB.xlsx) 
+* [ZhihuLiveDB](https://drive.google.com/open?id=1qIOHy5oADGfJLt5C6YHr5TxJLdND4Im2) 
 * [pretrained MTNet](./analysis/model/ZhihuLive_MTNet.pth)
 * [Zhihu Live Comments](https://drive.google.com/file/d/1MbezeRjCy5NUkrP2p8KzHqO66fNVANue/view?usp=sharing)
 
