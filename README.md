@@ -36,10 +36,12 @@ score. For more details, please refer to our [paper](https://arxiv.org/abs/1903.
 ## Citation
 If you find this repository, dataset or experimental results useful in your research, please cite our paper:
 ```
-@article{xu2019data,
-  title={Data-driven Approach for Quality Evaluation on Knowledge Sharing Platform},
+@inproceedings{xu2019data,
+  title={Data-Driven Approach for Quality Evaluation on Knowledge Sharing Platform},
   author={Xu, Lu and Xiang, Jinhai and Wang, Yating and Ni, Fuchuan},
-  journal={arXiv preprint arXiv:1903.00384},
-  year={2019}
+  booktitle={2019 International Conference on Machine Learning and Cybernetics (ICMLC)},
+  pages={1--6},
+  year={2019},
+  organization={IEEE}
 }
 ``` 
